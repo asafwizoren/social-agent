@@ -1,0 +1,8 @@
+{
+  "name": "vaniblu-social-agent",
+  "displayName": "VaniBlu Social Agent",
+  "version": "1.0.0",
+  "description": "Social media manager for VaniBlu brand",
+  "author": "VaniBlu",
+  "config": {}
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@vaniblu/social-agent",
+  "version": "1.0.0",
+  "type": "module",
+  "openclaw": ["./index.ts"],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@google/genai": "^0.8.0",
+    "@openclaw/sdk": "latest",
+    "@sinclair/typebox": "^0.34.0"
+  },
+  "devDependencies": {
+    "vitest": "^2.0.0",
+    "typescript": "^5.0.0",
+    "@types/node": "^22.0.0"
+  }
+}
