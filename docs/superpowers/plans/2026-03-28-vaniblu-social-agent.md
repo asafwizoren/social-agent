@@ -12,6 +12,106 @@
 
 ---
 
+## ⚠️ API Corrections (verified against installed openclaw package)
+
+The code examples in this plan were written before inspecting the actual SDK. These corrections override any conflicting code in the tasks below.
+
+### 1. Import paths
+
+```typescript
+// WRONG (plan):
+import { definePluginEntry } from "@openclaw/sdk/plugin";
+import { createPluginRuntimeStore } from "@openclaw/sdk/runtime";
+
+// CORRECT:
+import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
+import { createPluginRuntimeStore } from "openclaw/plugin-sdk/runtime-store";
+import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
+```
+
+### 2. `definePluginEntry` requires `id` and `description`
+
+```typescript
+// WRONG (plan):
+definePluginEntry({ name: "vaniblu-social-agent", register(api) {...} })
+
+// CORRECT:
+definePluginEntry({
+  id: "vaniblu-social-agent",
+  name: "VaniBlu Social Agent",
+  description: "Social media manager for VaniBlu brand",
+  register(api) {...}
+})
+```
+
+### 3. `createPluginRuntimeStore` API
+
+```typescript
+// WRONG (plan):
+const runtimeStore = createPluginRuntimeStore();
+runtimeStore.set(api.runtime);   // in register()
+runtimeStore.get()               // in execute()
+
+// CORRECT:
+type PluginRuntime = OpenClawPluginApi["runtime"];
+const runtimeStore = createPluginRuntimeStore<PluginRuntime>("error message");
+runtimeStore.setRuntime(api.runtime);  // in register()
+runtimeStore.getRuntime()              // in execute()
+```
+
+### 4. Tool structure — requires `label` + `details` in result
+
+```typescript
+// WRONG (plan):
+api.registerTool({
+  name: "vaniblu_researcher",
+  description: "...",
+  parameters: Type.Object({...}),
+  async execute(_id, params) {
+    return { content: [{ type: "text", text: result }] };  // missing details
+  },
+});
+
+// CORRECT:
+api.registerTool({
+  name: "vaniblu_researcher",
+  label: "VaniBlu Researcher",          // required field
+  description: "...",
+  parameters: Type.Object({...}),
+  async execute(toolCallId, params, signal) {
+    const runtime = runtimeStore.getRuntime();
+    return {
+      content: [{ type: "text", text: result }],
+      details: {}                        // required field
+    };
+  },
+});
+```
+
+### 5. ImageContent uses `mimeType` not `mediaType`
+
+```typescript
+// WRONG (plan):
+return { content: [{ type: "image", data: base64, mediaType: "image/png" }], details: {} };
+
+// CORRECT:
+return { content: [{ type: "image", data: base64, mimeType: "image/png" }], details: {} };
+```
+
+### 6. Web search API
+
+```typescript
+// The plan's SearchFn type was invented — actual API:
+const result = await runtime.webSearch.search({
+  args: { query: "search term" }
+});
+// result = { provider: string, result: Record<string, unknown> }
+// The shape of result.result depends on the configured provider — treat as unknown
+// Extract text content from result.result and pass to Claude for synthesis
+```
+
+---
+
 ## File Structure
 
 ```

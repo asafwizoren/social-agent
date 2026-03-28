@@ -1,13 +1,20 @@
 // extensions/vaniblu/index.ts
-import { definePluginEntry } from "@openclaw/sdk/plugin";
-import { createPluginRuntimeStore } from "@openclaw/sdk/runtime";
+import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
+import { createPluginRuntimeStore } from "openclaw/plugin-sdk/runtime-store";
+import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
 
-export const runtimeStore = createPluginRuntimeStore();
+type PluginRuntime = OpenClawPluginApi["runtime"];
+
+export const runtimeStore = createPluginRuntimeStore<PluginRuntime>(
+  "VaniBlu: runtime not initialized — make sure the plugin is registered"
+);
 
 export default definePluginEntry({
-  name: "vaniblu-social-agent",
+  id: "vaniblu-social-agent",
+  name: "VaniBlu Social Agent",
+  description: "Social media manager for VaniBlu brand",
   register(api) {
-    runtimeStore.set(api.runtime);
+    runtimeStore.setRuntime(api.runtime);
     // Tools registered in later tasks
   },
 });

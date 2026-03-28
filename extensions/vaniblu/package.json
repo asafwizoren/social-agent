@@ -10,7 +10,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
     "@google/genai": "^0.8.0",
-    "@openclaw/sdk": "latest",
+    "openclaw": "latest",
     "@sinclair/typebox": "^0.34.0"
   },
   "devDependencies": {
