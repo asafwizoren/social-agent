@@ -1,5 +1,6 @@
 // extensions/vaniblu/tests/researcher.test.ts
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import type Anthropic from "@anthropic-ai/sdk";
 
 // vi.mock is hoisted — intercepts the static import in researcher.ts
 vi.mock("../lib/anthropic-client.js", () => ({
@@ -39,7 +40,7 @@ describe("researchTrends", () => {
         opportunity: "סדרת פוסטים להורדת לחץ",
         content_angles: ["חינוכי", "רגשי", "אמא-בת"]
       }]) }]
-    } as any);
+    } as Anthropic.Message);
 
     const insights = await researchTrends("חרדת טיפוח", mockSearch);
     expect(insights).toHaveLength(1);
@@ -50,6 +51,7 @@ describe("researchTrends", () => {
       opportunity: expect.any(String),
       content_angles: expect.arrayContaining([expect.any(String)]),
     });
+    expect(mockSearch).toHaveBeenCalledTimes(3);
   });
 
   it("returns empty array when search yields no results", async () => {

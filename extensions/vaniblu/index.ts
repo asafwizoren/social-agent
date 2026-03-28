@@ -30,7 +30,8 @@ export default definePluginEntry({
         const runtime = runtimeStore.getRuntime();
         const searchAdapter: SearchFn = async ({ query }) => {
           const r = await runtime.webSearch.search({ args: { query } });
-          // result.result shape is provider-dependent — extract text best-effort
+          // TODO: result.result shape is provider-dependent. Currently we stringify it
+          // as best-effort context for Claude. When the provider is known, parse structured results.
           const raw = JSON.stringify(r.result ?? {});
           return {
             results: [{ title: query, snippet: raw.slice(0, 800), url: "" }],

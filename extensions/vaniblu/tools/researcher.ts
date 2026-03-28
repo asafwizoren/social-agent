@@ -19,7 +19,13 @@ export async function researchTrends(topic: string, searchFn: SearchFn): Promise
   const allResults: string[] = [];
 
   for (const query of queries) {
-    const { results } = await searchFn({ query });
+    let results: { title: string; snippet: string; url: string }[] = [];
+    try {
+      const r = await searchFn({ query });
+      results = r.results;
+    } catch {
+      continue;
+    }
     if (results.length === 0) continue;
     const lines = results.slice(0, 3).map(r => `- ${r.title}: ${r.snippet}`).join("\n");
     allResults.push(`### ${query}\n${lines}`);
@@ -27,16 +33,18 @@ export async function researchTrends(topic: string, searchFn: SearchFn): Promise
 
   if (allResults.length === 0) return [];
 
-  const message = await anthropic.messages.create({
-    model: MODEL,
-    max_tokens: 1024,
-    system: `אתה מנהל מחקר שוק למותג ${brain.brand} — ${brain.product}.
+  let raw = "[]";
+  try {
+    const message = await anthropic.messages.create({
+      model: MODEL,
+      max_tokens: 1024,
+      system: `אתה מנהל מחקר שוק למותג ${brain.brand} — ${brain.product}.
 קהל יעד: ${brain.target_audience.primary}.
 ערכי מותג: ${brain.brand_values.join(", ")}.
 נושאים אסורים: ${brain.forbidden_themes.join(", ")}.`,
-    messages: [{
-      role: "user",
-      content: `נושא מחקר: "${topic}"
+      messages: [{
+        role: "user",
+        content: `נושא מחקר: "${topic}"
 
 תוצאות חיפוש:
 ${allResults.join("\n\n")}
@@ -49,10 +57,12 @@ ${allResults.join("\n\n")}
   "opportunity": "הזדמנות תוכן ספציפית",
   "content_angles": ["כיוון 1", "כיוון 2", "כיוון 3"]
 }]`
-    }]
-  });
-
-  const raw = message.content[0].type === "text" ? message.content[0].text : "[]";
+      }]
+    });
+    raw = message.content[0].type === "text" ? message.content[0].text : "[]";
+  } catch {
+    return [];
+  }
   try {
     return JSON.parse(raw) as TrendInsight[];
   } catch {
@@ -75,7 +85,7 @@ export async function researcherToolExecute(topic: string, searchFn: SearchFn): 
     `רלוונטיות: ${ins.relevance_to_brand}\n` +
     `רמת סיכון: ${ins.risk_level}\n` +
     `הזדמנות: ${ins.opportunity}\n` +
-    `כיוונים: ${ins.content_angles.join(" | ")}`
+    `כיוונים: ${(ins.content_angles ?? []).join(" | ")}`
   ).join("\n\n---\n\n");
 
   return {
