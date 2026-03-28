@@ -48,10 +48,10 @@ export interface CritiqueResult {
 
 export type ToolTextResult = {
   content: [TextContent, ...TextContent[]];
-  details: Record<string, never>;
+  details: Record<string, unknown>;
 };
 
 export type ToolImageResult = {
   content: [ImageContent, ...ImageContent[]];
-  details: Record<string, never>;
+  details: Record<string, unknown>;
 };

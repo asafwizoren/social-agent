@@ -11,6 +11,7 @@
     "@anthropic-ai/sdk": "^0.39.0",
     "@google/genai": "^0.8.0",
     "openclaw": "latest",
+    "@mariozechner/pi-ai": "^0.61.1",
     "@sinclair/typebox": "^0.34.0"
   },
   "devDependencies": {
