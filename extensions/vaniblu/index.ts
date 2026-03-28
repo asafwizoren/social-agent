@@ -5,6 +5,7 @@ import type { OpenClawPluginApi } from "openclaw/plugin-sdk/plugin-entry";
 import { Type } from "@sinclair/typebox";
 import { researcherToolExecute } from "./tools/researcher.js";
 import type { SearchFn } from "./tools/researcher.js";
+import { creatorToolExecute } from "./tools/creator.js";
 
 type PluginRuntime = OpenClawPluginApi["runtime"];
 
@@ -38,6 +39,26 @@ export default definePluginEntry({
           };
         };
         return researcherToolExecute(params.topic, searchAdapter);
+      },
+    });
+
+    api.registerTool({
+      name: "vaniblu_creator",
+      label: "VaniBlu Creator",
+      description: "יצירת פוסט פייסבוק מלא למותג VaniBlu כולל hook, body, CTA ו-visual prompt לתמונה.",
+      parameters: Type.Object({
+        topic: Type.String({ description: "נושא הפוסט בעברית" }),
+        angle: Type.Union([
+          Type.Literal("emotional"),
+          Type.Literal("education"),
+          Type.Literal("storytelling"),
+          Type.Literal("mother-daughter"),
+          Type.Literal("science"),
+        ], { description: "זווית התוכן" }),
+        trend_context: Type.Optional(Type.String({ description: "הקשר טרנד מהresearcher (אופציונלי)" })),
+      }),
+      async execute(_toolCallId, params, _signal) {
+        return creatorToolExecute(params.topic, params.angle, params.trend_context);
       },
     });
   },
