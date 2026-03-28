@@ -6,6 +6,7 @@ import { Type } from "@sinclair/typebox";
 import { researcherToolExecute } from "./tools/researcher.js";
 import type { SearchFn } from "./tools/researcher.js";
 import { creatorToolExecute } from "./tools/creator.js";
+import { criticToolExecute } from "./tools/critic.js";
 
 type PluginRuntime = OpenClawPluginApi["runtime"];
 
@@ -59,6 +60,20 @@ export default definePluginEntry({
       }),
       async execute(_toolCallId, params, _signal) {
         return creatorToolExecute(params.topic, params.angle, params.trend_context);
+      },
+    });
+
+    api.registerTool({
+      name: "vaniblu_critic",
+      label: "VaniBlu Critic",
+      description: "ביקורת פוסט VaniBlu — בודק קרינג', אמינות, התאמה לקהל, וסיכוי conversion. תמיד קרא לכלי זה אחרי vaniblu_creator.",
+      parameters: Type.Object({
+        post_text: Type.String({ description: "טקסט הפוסט המלא" }),
+        cta: Type.String({ description: "ה-CTA של הפוסט" }),
+        angle: Type.String({ description: "זווית הפוסט" }),
+      }),
+      async execute(_toolCallId, params, _signal) {
+        return criticToolExecute(params.post_text, params.cta, params.angle);
       },
     });
   },
