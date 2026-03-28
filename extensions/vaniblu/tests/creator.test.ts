@@ -1,5 +1,5 @@
 // extensions/vaniblu/tests/creator.test.ts
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import type Anthropic from "@anthropic-ai/sdk";
 
 vi.mock("../lib/anthropic-client.js", () => ({
@@ -23,6 +23,10 @@ vi.mock("../lib/anthropic-client.js", () => ({
     }
   }
 }));
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
 
 import { createPost } from "../tools/creator.js";
 import { anthropic } from "../lib/anthropic-client.js";

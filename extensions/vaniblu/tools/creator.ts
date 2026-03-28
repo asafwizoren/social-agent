@@ -12,10 +12,12 @@ interface CreatePostParams {
 export async function createPost(params: CreatePostParams): Promise<PostDraft> {
   const brain = getBrandBrain();
 
-  const message = await anthropic.messages.create({
-    model: MODEL,
-    max_tokens: 2048,
-    system: `אתה יוצר תוכן למותג ${brain.brand} — ${brain.product}.
+  let raw = "";
+  try {
+    const message = await anthropic.messages.create({
+      model: MODEL,
+      max_tokens: 2048,
+      system: `אתה יוצר תוכן למותג ${brain.brand} — ${brain.product}.
 
 **קהל יעד:** ${brain.target_audience.primary}
 **טון:** ${brain.tone.join(", ")}
@@ -27,9 +29,9 @@ export async function createPost(params: CreatePostParams): Promise<PostDraft> {
 
 **דוגמאות טון:**
 ${brain.post_examples.map(e => `- ${e}`).join("\n")}`,
-    messages: [{
-      role: "user",
-      content: `צור פוסט פייסבוק על: "${params.topic}"
+      messages: [{
+        role: "user",
+        content: `צור פוסט פייסבוק על: "${params.topic}"
 זווית: ${params.angle}
 ${params.trend_context ? `הקשר טרנד: ${params.trend_context}` : ""}
 
@@ -43,15 +45,27 @@ ${params.trend_context ? `הקשר טרנד: ${params.trend_context}` : ""}
   "visual_prompt": "תיאור מפורט באנגלית לתמונה מתאימה, ללא טקסט בתמונה",
   "variants": ["וריאציה קצרה אלטרנטיבית אחת"]
 }`
-    }]
-  });
+      }]
+    });
+    const first = message.content[0];
+    raw = first?.type === "text" ? first.text : "";
+  } catch {
+    return {
+      post_text: "שגיאה ביצירת הפוסט. אנא נסי שוב.",
+      hook: "",
+      cta: brain.cta_default,
+      platform: "facebook",
+      angle: params.angle,
+      visual_prompt: "",
+      variants: [],
+    };
+  }
 
-  const raw = message.content[0].type === "text" ? message.content[0].text : "{}";
   try {
     return JSON.parse(raw) as PostDraft;
   } catch {
     return {
-      post_text: raw,
+      post_text: raw || "שגיאה ביצירת הפוסט. אנא נסי שוב.",
       hook: "",
       cta: brain.cta_default,
       platform: "facebook",
