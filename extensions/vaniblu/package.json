@@ -2,7 +2,7 @@
   "name": "@vaniblu/social-agent",
   "version": "1.0.0",
   "type": "module",
-  "openclaw": ["./index.ts"],
+  "openclaw": { "id": "vaniblu-social-agent", "extensions": ["./index.ts"] },
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest"

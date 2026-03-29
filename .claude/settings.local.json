@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s \"https://graph.facebook.com/v19.0/me?access_token=1382753073655609|aK4XOmaMEIL3SF8GSYeCZo5NvOE\")"
+    ]
+  }
+}

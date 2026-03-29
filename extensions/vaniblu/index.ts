@@ -8,6 +8,7 @@ import type { SearchFn } from "./tools/researcher.js";
 import { creatorToolExecute } from "./tools/creator.js";
 import { criticToolExecute } from "./tools/critic.js";
 import { imageToolExecute } from "./tools/image.js";
+import { analystToolExecute } from "./tools/analyst.js";
 
 type PluginRuntime = OpenClawPluginApi["runtime"];
 
@@ -87,6 +88,18 @@ export default definePluginEntry({
       }),
       async execute(_toolCallId, params, _signal) {
         return imageToolExecute(params.visual_prompt);
+      },
+    });
+
+    api.registerTool({
+      name: "vaniblu_analyst",
+      label: "VaniBlu Analyst",
+      description: "ניתוח ביצועי אינסטגרם של VaniBlu — שולף נתוני עוקבים, לייקים, תגובות וחשיפות לפוסטים האחרונים.",
+      parameters: Type.Object({
+        limit: Type.Optional(Type.Number({ description: "כמה פוסטים אחרונים לנתח (ברירת מחדל: 10, מקסימום: 25)", minimum: 1, maximum: 25 })),
+      }),
+      async execute(_toolCallId, params, _signal) {
+        return analystToolExecute(params.limit ?? 10);
       },
     });
   },
