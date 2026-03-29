@@ -1,6 +1,6 @@
 // extensions/vaniblu/tools/image.ts
 import { GoogleGenAI } from "@google/genai";
-import type { ToolImageResult } from "../lib/types.js";
+import type { ToolImageResult, ToolTextResult } from "../lib/types.js";
 
 interface ImageResult {
   data: string;
@@ -35,7 +35,17 @@ export async function generateImage(visualPrompt: string): Promise<ImageResult> 
   return { data: imageBytes, mimeType: "image/png" };
 }
 
-export async function imageToolExecute(visualPrompt: string): Promise<ToolImageResult> {
-  const { data, mimeType } = await generateImage(visualPrompt);
-  return { content: [{ type: "image", data, mimeType }], details: {} };
+export async function imageToolExecute(
+  visualPrompt: string
+): Promise<ToolImageResult | ToolTextResult> {
+  try {
+    const { data, mimeType } = await generateImage(visualPrompt);
+    return { content: [{ type: "image", data, mimeType }], details: {} };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "שגיאה ביצירת התמונה";
+    return {
+      content: [{ type: "text", text: `שגיאה ביצירת התמונה: ${message}` }],
+      details: {},
+    };
+  }
 }
