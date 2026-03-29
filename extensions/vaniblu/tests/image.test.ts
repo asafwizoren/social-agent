@@ -21,16 +21,6 @@ import { GoogleGenAI } from "@google/genai";
 
 beforeEach(() => {
   vi.clearAllMocks();
-  // Re-apply mock for each test
-  vi.mocked(GoogleGenAI).mockImplementation(() => ({
-    models: {
-      generateImages: vi.fn().mockResolvedValue({
-        generatedImages: [{
-          image: { imageBytes: Buffer.from("fake-image-bytes").toString("base64") }
-        }]
-      })
-    }
-  }) as any);
 });
 
 describe("generateImage", () => {
@@ -50,5 +40,17 @@ describe("generateImage", () => {
     }) as any);
 
     await expect(generateImage("valid prompt")).rejects.toThrow("No image returned from Imagen 3");
+  });
+
+  it("throws when GOOGLE_AI_STUDIO_KEY is not set", async () => {
+    const originalKey = process.env.GOOGLE_AI_STUDIO_KEY;
+    delete process.env.GOOGLE_AI_STUDIO_KEY;
+    try {
+      await expect(generateImage("valid prompt")).rejects.toThrow(
+        "GOOGLE_AI_STUDIO_KEY environment variable is required"
+      );
+    } finally {
+      process.env.GOOGLE_AI_STUDIO_KEY = originalKey;
+    }
   });
 });
