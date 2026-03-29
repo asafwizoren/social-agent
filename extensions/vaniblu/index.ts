@@ -7,6 +7,7 @@ import { researcherToolExecute } from "./tools/researcher.js";
 import type { SearchFn } from "./tools/researcher.js";
 import { creatorToolExecute } from "./tools/creator.js";
 import { criticToolExecute } from "./tools/critic.js";
+import { imageToolExecute } from "./tools/image.js";
 
 type PluginRuntime = OpenClawPluginApi["runtime"];
 
@@ -74,6 +75,18 @@ export default definePluginEntry({
       }),
       async execute(_toolCallId, params, _signal) {
         return criticToolExecute(params.post_text, params.cta, params.angle);
+      },
+    });
+
+    api.registerTool({
+      name: "vaniblu_image",
+      label: "VaniBlu Image",
+      description: "יצירת תמונה לפוסט VaniBlu דרך Imagen 3. קרא לכלי זה עם ה-visual_prompt שמגיע מvaniblu_creator.",
+      parameters: Type.Object({
+        visual_prompt: Type.String({ description: "תיאור התמונה באנגלית (מגיע מvaniblu_creator)" }),
+      }),
+      async execute(_toolCallId, params, _signal) {
+        return imageToolExecute(params.visual_prompt);
       },
     });
   },
