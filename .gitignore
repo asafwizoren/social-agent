@@ -4,3 +4,5 @@ __pycache__/
 *.pyc
 node_modules/
 .history/
+client_secret.json
+youtube_token.json
